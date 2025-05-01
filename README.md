@@ -47,37 +47,37 @@ Além dos cálculos, fornece análises detalhadas e sugestões inteligentes para
 
 As áreas e os índices são calculados usando as seguintes fórmulas:
 
-* **Área da Matriz:**
+**Área da Matriz:**
 
-    ```latex
-    A = \pi \left( \frac{d_{\text{matriz}}}{2} \right)^2
-    ```
+$$
+A = \pi \left( \frac{d_{\text{matriz}}}{2} \right)^2
+$$
 
-* **Área Final do Cabo:**
+**Área Final do Cabo:**
 
-    ```latex
-    A = \pi \left( \frac{d_{\text{cabo}}}{2} \right)^2
-    ```
+$$
+A = \pi \left( \frac{d_{\text{cabo}}}{2} \right)^2
+$$
 
-* **Área de Fluxo:**
+**Área de Fluxo:**
 
-    ```latex
-    A = \pi \left( \frac{d_{\text{matriz}}}{2} \right)^2 - \pi \left( \frac{d_{\text{guia}}}{2} \right)^2
-    ```
+$$
+A = \pi \left( \frac{d_{\text{matriz}}}{2} \right)^2 - \pi \left( \frac{d_{\text{guia}}}{2} \right)^2
+$$
 
-* **DDR:**
+**DDR:**
 
-    ```latex
-    DDR = \frac{\text{Área da Matriz}}{\text{Área do Cabo}}
-    ```
+$$
+DDR = \frac{\text{Área da Matriz}}{\text{Área do Cabo}}
+$$
 
-* **DRB:**
+**DRB:**
 
-    ```latex
-    DRB = \frac{\text{Área da Matriz}}{\text{Área de Fluxo}}
-    ```
+$$
+DRB = \frac{\text{Área da Matriz}}{\text{Área de Fluxo}}
+$$
 
-    Os valores de referência para DDR e DRB são ajustados automaticamente com base no material selecionado (PVC, LSZH, HDPE, PBT), garantindo recomendações precisas.
+Os valores de referência para DDR e DRB são ajustados automaticamente com base no material selecionado (PVC, LSZH, HDPE, PBT), garantindo recomendações precisas.
 
 🔒 **Salvamento de Configurações**
 
