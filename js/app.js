@@ -134,6 +134,8 @@ function loadPreferences() {
             }
 
             showTemporaryMessage(translations[state.lang].configLoaded);
+            updateLastLoaded(Date.now());
+
         }
     } catch (error) {
         console.error("Erro ao carregar preferências:", error);
@@ -161,10 +163,60 @@ function savePreferences() {
 
         localStorage.setItem('ddrCalculatorState', JSON.stringify(stateToSave));
         showTemporaryMessage(translations[state.lang].configSaved);
+        updateLastLoaded(Date.now());
+
     } catch (error) {
         console.error("Erro ao salvar preferências:", error);
     }
 }
+
+function saveToHistory(record) {
+    let history = JSON.parse(localStorage.getItem('ddrCalculatorHistory') || '[]');
+
+    // Adiciona no topo
+    history.unshift(record);
+
+    // Mantém apenas os 5 últimos registros
+    if (history.length > 5) {
+        history = history.slice(0, 5);
+    }
+
+    localStorage.setItem('ddrCalculatorHistory', JSON.stringify(history));
+
+    renderHistory();
+}
+
+function renderHistory() {
+    const historyList = document.getElementById("historyList");
+    let history = JSON.parse(localStorage.getItem('ddrCalculatorHistory') || '[]');
+
+    if (history.length === 0) {
+        historyList.innerHTML = `<p>-- Nenhum cálculo registrado ainda --</p>`;
+        return;
+    }
+
+    // Monta os itens
+    historyList.innerHTML = history.map(item => {
+        const dateStr = new Date(item.timestamp).toLocaleString(state.lang === "pt" ? 'pt-BR' : 'en-US', {
+            dateStyle: 'short',
+            timeStyle: 'short'
+        });
+
+        return `
+            <div class="history-item">
+                <strong>🛠️ ${state.lang === "pt" ? "Material" : "Material"}: ${item.material}</strong>
+                <span>${state.lang === "pt" ? "DDR" : "DDR"}: ${item.ddr} | ${state.lang === "pt" ? "DRB" : "DRB"}: ${item.drb}</span>
+                <span class="small">
+                    ${state.lang === "pt" ? "Matriz" : "Die"}: ${item.matrixDiameter} mm,
+                    ${state.lang === "pt" ? "Guia" : "Tip"}: ${item.guideOuterDiameter} mm,
+                    ${state.lang === "pt" ? "Cabo" : "Cable"}: ${item.cableDiameter} mm
+                </span>
+                <span class="small">🕒 ${state.lang === "pt" ? "Calculado em" : "Calculated on"}: ${dateStr}</span>
+            </div>
+        `;
+    }).join('');
+}
+
 
 /**
  * Mostra uma mensagem temporária ao usuário
@@ -180,6 +232,18 @@ function showTemporaryMessage(message) {
         observations.innerHTML = originalContent;
     }, 2000);
 }
+
+function updateLastLoaded(timestamp) {
+    const lastLoadedDiv = document.getElementById("lastLoaded");
+    const dateStr = new Date(timestamp).toLocaleString(state.lang === "pt" ? 'pt-BR' : 'en-US', {
+        dateStyle: 'short',
+        timeStyle: 'short'
+    });
+    lastLoadedDiv.innerText = state.lang === "pt"
+        ? `⚙️ Última configuração carregada em: ${dateStr}`
+        : `⚙️ Last configuration loaded on: ${dateStr}`;
+}
+
 
 /**
  * Muda o idioma da interface
@@ -228,6 +292,17 @@ function switchLanguage() {
             state.lastCalculated.material
         );
     }
+
+    // Se houver uma configuração recente, atualiza a data
+    const lastLoadedDiv = document.getElementById("lastLoaded");
+    if (lastLoadedDiv && lastLoadedDiv.innerText.trim() !== "") {
+        const now = Date.now();
+        updateLastLoaded(now);
+    }
+
+    renderHistory();
+
+
 }
 
 /**
@@ -317,6 +392,17 @@ function calculateValues() {
 
     // Atualiza as observações baseadas nos valores calculados
     updateObservations(ddr, drb, material);
+    // Salva no histórico
+    saveToHistory({
+        timestamp: Date.now(),
+        material: material,
+        ddr: ddr,
+        drb: drb,
+        matrixDiameter: dMatrix,
+        guideOuterDiameter: dGuideOuter,
+        cableDiameter: dCable
+    });
+
 }
 
 /**
@@ -678,6 +764,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Configura os tooltips para acessibilidade
     setupTooltipAccessibility();
+
+    // Renderiza histórico ao carregar
+renderHistory();
+
 });
 
 /**
