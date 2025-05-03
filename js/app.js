@@ -436,13 +436,13 @@ function updateRuler(
     const labels = document.getElementById(labelsId);
     const acceptable = document.getElementById(acceptableId);
 
-    const rulerWidth = Math.max(ruler.clientWidth, 50);
+    const rulerWidth = Math.max(ruler.clientWidth, 10);
 
     // Calcula faixa aceitável
     const acceptMinPos = (acceptMin / scale) * rulerWidth;
     const acceptMaxPos = (acceptMax / scale) * rulerWidth;
 
-    const acceptableWidth = Math.max(5, (acceptMaxPos - acceptMinPos)); // pelo menos 5px
+    const acceptableWidth = Math.max(6, (acceptMaxPos - acceptMinPos)); // pelo menos 5px
     acceptable.style.left = acceptMinPos + "px";
     acceptable.style.width = acceptableWidth + "px";
 
