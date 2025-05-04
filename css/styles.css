@@ -17,12 +17,13 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--background);
+            font-family: 'Rajdhani', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0F2027, #203A43, #2C5364);
             color: var(--text-light);
             padding: 1rem;
             line-height: 1.6;
         }
+        
 
         .results-grid {
             display: grid;
@@ -58,10 +59,18 @@
             padding: 0.5rem;
         }
 
+        @keyframes glow {
+            0% { text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary); }
+            50% { text-shadow: 0 0 20px var(--primary), 0 0 40px var(--primary); }
+            100% { text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary); }
+        }
+
         header h1 {
             color: var(--primary);
             margin: 0;
             font-size: 1.8rem;
+            text-shadow: 0 0 10px var(--primary);
+            animation: glow 2.5s infinite alternate;
         }
 
         .language-container {
@@ -84,11 +93,14 @@
         .container {
             max-width: 80%;
             margin: auto;
-            background: var(--card-bg);
+            background: rgba(45, 45, 68, 0.5);
+            backdrop-filter: blur(10px);
             padding: 1.5rem;
             border-radius: 1rem;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 20px rgba(0, 204, 255, 0.1);
+            border: 1px solid rgba(0, 204, 255, 0.2);
         }
+        
 
         .form-group {
             margin-bottom: 1rem;
@@ -164,20 +176,24 @@
             border-radius: 0.5rem;
             margin: 0.5rem 0;
             cursor: pointer;
-            background: var(--secondary);
+            background: linear-gradient(90deg, #00BFFF, #007BFF);
             color: white;
-            font-weight: 600;
-            transition: background-color 0.3s, transform 0.2s;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
         }
-
+        
         button:hover {
-            background: #5649c0;
-            transform: translateY(-2px);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #00BFFF;
         }
-
+        
         button:active {
-            transform: translateY(0);
+            transform: scale(1);
         }
+        
+        
 
         .cards {
             display: grid;
@@ -218,16 +234,24 @@
         }
 
         .observation-card {
-            background: #2f324a;
+            background: rgba(47, 50, 74, 0.4);
             border-radius: 0.75rem;
             padding: 1rem;
             margin-bottom: 1rem;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 0 15px rgba(0, 191, 255, 0.15);
+            border: 1px solid rgba(0, 191, 255, 0.2);
+            backdrop-filter: blur(10px);
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.3s ease;
         }
+        
+        .observation-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(0, 191, 255, 0.3);
+        }
+        
 
         .observations-section {
             background: #333851;
@@ -236,9 +260,6 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
 
-        .observation-card:hover {
-            transform: translateY(-3px);
-        }
 
         .observation-card h4 {
             color: var(--primary);
@@ -281,45 +302,58 @@
         .ruler {
             margin: 2rem 0;
             padding: 0 0.5rem;
+            overflow: visible;
         }
 
         .ruler h3 {
             margin-bottom: 0.5rem;
         }
 
+        @media (hover: none) {
+            .tooltip-container:active .tooltip-text {
+                visibility: visible;
+                opacity: 1;
+                pointer-events: auto;
+                transition: opacity 0.5s ease;
+            }
+        }
+        
+
         .ruler-bar {
             position: relative;
-            background: #444;
-            height: 1.25rem;
-            border-radius: 0.625rem;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 191, 255, 0.4);
+            box-shadow: 0 0 10px rgba(0, 191, 255, 0.1);
+            border-radius: 1rem;
             overflow: hidden;
-            border: 1px solid #555;
-            min-width: 100%;
-            width: 100%;
-            box-sizing: border-box;
-            height: 1.5rem;
+            height: 1.75rem;
+            transition: all 0.3s ease;
         }
+        
 
         .ruler-fill {
             position: absolute;
             top: 0;
             height: 100%;
-            background: rgba(0, 255, 255, 0.5);
-            /* Meio transparente */
-            opacity: 0.9;
+            background: rgba(0, 191, 255, 0.5);
+            backdrop-filter: blur(3px);
+            box-shadow: 0 0 10px rgba(0, 191, 255, 0.4);
             z-index: 2;
+            transition: all 0.3s ease;
         }
+        
 
         .ruler-acceptable {
             position: absolute;
             top: 0;
             height: 100%;
-            background: rgba(255, 223, 0, 0.3);
-            /* Amarelo claro translúcido */
-            opacity: 0.7;
+            background: rgba(60, 255, 110, 0.3); /* verde neon translúcido */
+            box-shadow: inset 0 0 10px rgba(60, 255, 110, 0.4);
+            backdrop-filter: blur(2px);
             z-index: 1;
-            /* Atrás da faixa ideal e do marcador */
+            transition: all 0.3s ease;
         }
+        
 
         .ruler-fill::after,
         .ruler-acceptable::after {
@@ -328,8 +362,8 @@
             bottom: 120%;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: #fff;
+            background: rgba(0, 191, 255, 0.2);
+            color: #00BFFF;
             padding: 0.3rem 0.6rem;
             border-radius: 4px;
             white-space: nowrap;
@@ -338,8 +372,11 @@
             transition: opacity 0.2s ease;
             font-size: 0.75rem;
             z-index: 10;
+            border: 1px solid #00BFFF;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 0 8px rgba(0, 191, 255, 0.3);
         }
-
+        
         .ruler-fill:hover::after,
         .ruler-acceptable:hover::after {
             opacity: 1;
@@ -364,15 +401,23 @@
         .marker {
             position: absolute;
             top: 50%;
-            width: 1rem;
-            height: 1rem;
-            background: var(--marker);
+            width: 1.25rem;
+            height: 1.25rem;
+            background: #00BFFF;
             border-radius: 50%;
             transform: translate(-50%, -50%);
             border: 2px solid white;
+            box-shadow: 0 0 10px #00BFFF;
             z-index: 3;
+            animation: pulse 2s infinite;
         }
-
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 5px #00BFFF; }
+            50% { box-shadow: 0 0 15px #00BFFF; }
+            100% { box-shadow: 0 0 5px #00BFFF; }
+        }
+        
         .ruler-labels {
             display: flex;
             justify-content: space-between;
