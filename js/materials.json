@@ -1,0 +1,42 @@
+{
+    "PVC": {
+        "ddrMin": 1.1,
+        "ddrMax": 1.3,
+        "drbMin": 0.9,
+        "drbMax": 1.1,
+        "ddrAcceptMin": 1.0,
+        "ddrAcceptMax": 1.4,
+        "drbAcceptMin": 0.8,
+        "drbAcceptMax": 1.2
+    },
+    "LSZH": {
+        "ddrMin": 1.2,
+        "ddrMax": 1.4,
+        "drbMin": 0.95,
+        "drbMax": 1.2,
+        "ddrAcceptMin": 1.1,
+        "ddrAcceptMax": 1.5,
+        "drbAcceptMin": 0.85,
+        "drbAcceptMax": 1.3
+    },
+    "HDPE": {
+        "ddrMin": 1.3,
+        "ddrMax": 1.5,
+        "drbMin": 1.0,
+        "drbMax": 1.3,
+        "ddrAcceptMin": 1.2,
+        "ddrAcceptMax": 1.6,
+        "drbAcceptMin": 0.9,
+        "drbAcceptMax": 1.4
+    },
+    "PBT": {
+        "ddrMin": 1.15,
+        "ddrMax": 1.35,
+        "drbMin": 0.95,
+        "drbMax": 1.25,
+        "ddrAcceptMin": 1.05,
+        "ddrAcceptMax": 1.45,
+        "drbAcceptMin": 0.85,
+        "drbAcceptMax": 1.35
+    }
+}

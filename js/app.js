@@ -83,6 +83,17 @@ let state = {
     lastCalculated: null
 };
 
+let materialLimits = {};
+async function loadMaterialLimits() {
+    try {
+        const response = await fetch('js/materials.json');
+        materialLimits = await response.json();
+    } catch (error) {
+        console.error("Erro ao carregar materials.json:", error);
+    }
+}
+
+
 /**
  * Carrega as preferências salvas do usuário
  */
@@ -129,8 +140,13 @@ function loadPreferences() {
 
                 // Se todos os campos numéricos têm valores, recalcula
                 if (formData.cableDiameter && formData.matrixDiameter && formData.guideOuterDiameter) {
-                    calculateValues();
+                    if (Object.keys(materialLimits).length > 0) {
+                        calculateValues();
+                    } else {
+                        console.warn("Material limits não carregados ainda.");
+                    }
                 }
+
             }
 
             showTemporaryMessage(translations[state.lang].configLoaded);
@@ -413,51 +429,12 @@ function calculateValues() {
  */
 function updateRulers(ddr, drb, material) {
     // Faixas recomendadas para cada material
-    const recommendations = {
-        PVC: {
-            ddrMin: 1.1,
-            ddrMax: 1.3,
-            drbMin: 0.9,
-            drbMax: 1.1,
-            ddrAcceptMin: 1.0,
-            ddrAcceptMax: 1.4,
-            drbAcceptMin: 0.8,
-            drbAcceptMax: 1.2
-        },
-        LSZH: {
-            ddrMin: 1.2,
-            ddrMax: 1.4,
-            drbMin: 0.95,
-            drbMax: 1.2,
-            ddrAcceptMin: 1.1,
-            ddrAcceptMax: 1.5,
-            drbAcceptMin: 0.85,
-            drbAcceptMax: 1.3
-        },
-        HDPE: {
-            ddrMin: 1.3,
-            ddrMax: 1.5,
-            drbMin: 1.0,
-            drbMax: 1.3,
-            ddrAcceptMin: 1.2,
-            ddrAcceptMax: 1.6,
-            drbAcceptMin: 0.9,
-            drbAcceptMax: 1.4
-        },
-        PBT: {
-            ddrMin: 1.15,
-            ddrMax: 1.35,
-            drbMin: 0.95,
-            drbMax: 1.25,
-            ddrAcceptMin: 1.05,
-            ddrAcceptMax: 1.45,
-            drbAcceptMin: 0.85,
-            drbAcceptMax: 1.35
-        }
-    };
+    const limits = materialLimits[material];
+    if (!limits) {
+        console.warn("Limites não encontrados para o material:", material);
+        return;
+    }
 
-
-    const limits = recommendations[material];
 
     // Escala máxima dinâmica para as réguas
     const ddrScale = Math.max(2.0, parseFloat(ddr) * 1.2);
@@ -583,51 +560,12 @@ function updateObservations(ddr, drb, material) {
     const t = translations[state.lang];
     const observationsDiv = document.getElementById("observations");
 
-    const recommendations = {
-        PVC: {
-            ddrMin: 1.1,
-            ddrMax: 1.3,
-            drbMin: 0.9,
-            drbMax: 1.1,
-            ddrAcceptMin: 1.0,
-            ddrAcceptMax: 1.4,
-            drbAcceptMin: 0.8,
-            drbAcceptMax: 1.2
-        },
-        LSZH: {
-            ddrMin: 1.2,
-            ddrMax: 1.4,
-            drbMin: 0.95,
-            drbMax: 1.2,
-            ddrAcceptMin: 1.1,
-            ddrAcceptMax: 1.5,
-            drbAcceptMin: 0.85,
-            drbAcceptMax: 1.3
-        },
-        HDPE: {
-            ddrMin: 1.3,
-            ddrMax: 1.5,
-            drbMin: 1.0,
-            drbMax: 1.3,
-            ddrAcceptMin: 1.2,
-            ddrAcceptMax: 1.6,
-            drbAcceptMin: 0.9,
-            drbAcceptMax: 1.4
-        },
-        PBT: {
-            ddrMin: 1.15,
-            ddrMax: 1.35,
-            drbMin: 0.95,
-            drbMax: 1.25,
-            ddrAcceptMin: 1.05,
-            ddrAcceptMax: 1.45,
-            drbAcceptMin: 0.85,
-            drbAcceptMax: 1.35
-        }
-    };
+    const limits = materialLimits[material];
+    if (!limits) {
+        console.warn("Limites não encontrados para o material:", material);
+        return;
+    }
 
-
-    const limits = recommendations[material];
 
     // Mensagens para DDR
     let ddrStatusMsg, ddrTipMsg, ddrIcon, ddrClass;
@@ -743,7 +681,9 @@ function resetForm() {
 }
 
 // Inicialização da aplicação
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+
+    await loadMaterialLimits();
     // Registra eventos
     document.getElementById("languageSelector").addEventListener("change", switchLanguage);
     document.getElementById("calculateBtn").addEventListener("click", calculateValues);
@@ -766,7 +706,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setupTooltipAccessibility();
 
     // Renderiza histórico ao carregar
-renderHistory();
+    renderHistory();
 
 });
 
@@ -791,5 +731,12 @@ function setupTooltipAccessibility() {
                 tooltipText.style.opacity = isVisible ? '0' : '1';
             }
         });
+        // Esconde o tooltip ao perder o foco (melhor controle)
+        container.addEventListener('blur', function () {
+            const tooltipText = this.querySelector('.tooltip-text');
+            tooltipText.style.visibility = 'hidden';
+            tooltipText.style.opacity = '0';
+        });
+
     });
 }
