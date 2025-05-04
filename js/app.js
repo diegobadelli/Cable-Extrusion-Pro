@@ -4,10 +4,6 @@
 const translations = {
     pt: {
         title: "Cable Extrusion Pro: Calculadora DDR/DRB & Insights Técnicos",
-        matrixLabel: "Tipo da Matriz",
-        matrixTooltip: "Parte externa do cabeçote que define a espessura final.",
-        toolLabel: "Tipo da Guia",
-        toolTooltip: "Mandril (ou Tip) que centraliza o núcleo e define a zona de extrusão.",
         materialLabel: "Tipo de Material",
         cableLabel: "Diâmetro Final do Cabo (mm)",
         matrixDiameterLabel: "Diâmetro Interno da Matriz (mm)",
@@ -19,7 +15,6 @@ const translations = {
         areaFlowLabel: "Área de Fluxo",
         areaCableLabel: "Área Final do Cabo",
         obsTitle: "Observações Inteligentes",
-        options: ["Tubular", "Semi-pressão", "Pressão"],
         errorMsg: "Por favor, insira um valor válido maior que zero.",
         ddrLow: "DDR baixo: risco de rugas.",
         ddrHigh: "DDR alto: risco de tensão excessiva.",
@@ -40,10 +35,6 @@ const translations = {
     },
     en: {
         title: "Cable Extrusion Pro: DDR/DRB Calculator & Process Insights",
-        matrixLabel: "Die Type",
-        matrixTooltip: "External part of the head that defines the final thickness.",
-        toolLabel: "Tip Type",
-        toolTooltip: "Mandrel (or Tip) that centers the core and defines the extrusion zone.",
         materialLabel: "Material Type",
         cableLabel: "Final Cable Diameter (mm)",
         matrixDiameterLabel: "Die Inner Diameter (mm)",
@@ -55,7 +46,6 @@ const translations = {
         areaFlowLabel: "Flow Area",
         areaCableLabel: "Final Cable Area",
         obsTitle: "Smart Observations",
-        options: ["Tubular", "Semi-pressure", "Pressure"],
         errorMsg: "Please enter a valid value greater than zero.",
         ddrLow: "Low DDR: risk of wrinkles.",
         ddrHigh: "High DDR: risk of high tension.",
@@ -82,6 +72,10 @@ let state = {
     lang: "pt",
     lastCalculated: null
 };
+
+let ddrChart = null;
+let drbChart = null;
+
 
 let materialLimits = {};
 async function loadMaterialLimits() {
@@ -113,14 +107,6 @@ function loadPreferences() {
             // Preenche os campos do formulário
             if (parsedState.formData) {
                 const formData = parsedState.formData;
-
-                if (formData.matrixType) {
-                    document.getElementById("matrixType").value = formData.matrixType;
-                }
-
-                if (formData.toolType) {
-                    document.getElementById("toolType").value = formData.toolType;
-                }
 
                 if (formData.materialType) {
                     document.getElementById("materialType").value = formData.materialType;
@@ -164,8 +150,6 @@ function loadPreferences() {
 function savePreferences() {
     try {
         const formData = {
-            matrixType: document.getElementById("matrixType").value,
-            toolType: document.getElementById("toolType").value,
             materialType: document.getElementById("materialType").value,
             cableDiameter: document.getElementById("cableDiameter").value,
             matrixDiameter: document.getElementById("matrixDiameter").value,
@@ -260,6 +244,105 @@ function updateLastLoaded(timestamp) {
         : `⚙️ Last configuration loaded on: ${dateStr}`;
 }
 
+function renderApexChart(id, value, scaleMax, faixaMin, faixaMax, faixaAcceptMin, faixaAcceptMax, title) {
+    const options = {
+        chart: {
+            type: 'scatter',  // mantemos scatter como você quis
+            height: 120,
+            toolbar: { show: false },
+            animations: { enabled: false }
+        },
+        series: [{
+            name: title,
+            data: [[parseFloat(value), 0]]  // formato correto: [[x, y]]
+        }],
+        markers: {
+            size: 8,  // 👈 diminui o tamanho padrão
+            colors: ['#00ccff'],
+            strokeColors: '#fff',
+            strokeWidth: 2,
+            hover: {
+                size: 10  // 👈 diminui também o tamanho no hover
+            }
+        },
+
+        xaxis: {
+            min: 0,
+            max: scaleMax,
+            rangePadding: 0.05,  // 🔥 adiciona ~5% de folga em cada ponta
+            tickAmount: Math.ceil(scaleMax * 2),
+            decimalsInFloat: 2,
+            title: {
+                text: title,
+                style: { color: '#e0e0e0', fontSize: '14px' }
+            },
+            labels: {
+                style: { colors: '#e0e0e0', fontSize: '14px' },
+                formatter: function (val) {
+                    return parseFloat(val).toFixed(2);
+                }
+            }
+        },
+
+        yaxis: {
+            min: -1,
+            max: 1,
+            show: false
+        },
+        annotations: {
+            xaxis: [
+                {
+                    x: faixaAcceptMin,
+                    x2: faixaAcceptMax,
+                    borderColor: '#FFA500',
+                    fillColor: 'rgba(255, 165, 0, 0.3)',
+
+                },
+                {
+                    x: faixaMin,
+                    x2: faixaMax,
+                    borderColor: '#00FF00',
+                    fillColor: 'rgba(0, 200, 83, 0.4)',
+
+                }
+            ]
+        },
+        tooltip: {
+            enabled: false // remove o tooltip duplicado de vez
+        },
+        dataLabels: {
+            enabled: true,
+            formatter: function (val, { w, seriesIndex, dataPointIndex }) {
+                const v = w.config.series[seriesIndex].data[dataPointIndex][0];
+                return v.toFixed(2);
+            },
+            offsetY: -10,
+            style: {
+                fontSize: '12px',
+                colors: ['#fff']
+            },
+            background: {
+                enabled: true,
+                foreColor: '#333',
+                padding: 4,
+                borderRadius: 2,
+                borderWidth: 1,
+                borderColor: '#999',
+                opacity: 0.9,
+            }
+        },
+
+
+
+    };
+
+    const chart = new ApexCharts(document.querySelector(`#${id}`), options);
+    chart.render();
+    return chart;
+}
+
+
+
 
 /**
  * Muda o idioma da interface
@@ -285,15 +368,9 @@ function switchLanguage() {
     document.getElementById("areaFlowLabel").innerText = t.areaFlowLabel;
     document.getElementById("areaCableLabel").innerText = t.areaCableLabel;
     document.getElementById("obsTitle").innerText = t.obsTitle;
+    document.getElementById("idealLabel").innerText = t.obsTitle.includes("Smart") ? "Ideal" : "Ideal";
+    document.getElementById("acceptableLabel").innerText = t.obsTitle.includes("Smart") ? "Acceptable" : "Aceitável";
 
-    // Atualiza opções dos selects
-    const opt = t.options;
-    ['matrixType', 'toolType'].forEach(id => {
-        const select = document.getElementById(id);
-        select.options[0].text = opt[0];
-        select.options[1].text = opt[1];
-        select.options[2].text = opt[2];
-    });
 
     // Atualiza mensagens de erro
     document.getElementById("cableDiameterError").innerText = t.errorMsg;
@@ -403,11 +480,47 @@ function calculateValues() {
         material: material
     };
 
-    // Atualiza os marcadores visuais nas réguas
-    updateRulers(ddr, drb, material);
-
     // Atualiza as observações baseadas nos valores calculados
     updateObservations(ddr, drb, material);
+
+    // Limpar gráficos antigos (se existirem)
+    if (ddrChart) { ddrChart.destroy(); }
+    if (drbChart) { drbChart.destroy(); }
+
+    // Obter limites para escala e faixa ideal
+    const limits = materialLimits[material];
+    console.log("Limites carregados para material:", material, limits);
+
+
+    // Calcula a escala máxima (20% acima do maior valor)
+    const ddrScale = Math.max(parseFloat(ddr), limits.ddrMax) * 1.2;
+    const drbScale = Math.max(parseFloat(drb), limits.drbMax) * 1.2;
+
+    // Renderiza gráficos atualizados
+    ddrChart = renderApexChart(
+        'ddrChart',
+        ddr,
+        ddrScale,
+        limits.ddrMin,
+        limits.ddrMax,
+        limits.ddrAcceptMin,
+        limits.ddrAcceptMax,
+        'DDR'
+    );
+
+
+    drbChart = renderApexChart(
+        'drbChart',
+        drb,
+        drbScale,
+        limits.drbMin,
+        limits.drbMax,
+        limits.drbAcceptMin,
+        limits.drbAcceptMax,
+        'DRB'
+    );
+
+
     // Salva no histórico
     saveToHistory({
         timestamp: Date.now(),
@@ -419,135 +532,6 @@ function calculateValues() {
         cableDiameter: dCable
     });
 
-}
-
-/**
- * Atualiza os marcadores visuais nas réguas
- * @param {number} ddr - Valor DDR calculado
- * @param {number} drb - Valor DRB calculado
- * @param {string} material - Material selecionado
- */
-function updateRulers(ddr, drb, material) {
-    // Faixas recomendadas para cada material
-    const limits = materialLimits[material];
-    if (!limits) {
-        console.warn("Limites não encontrados para o material:", material);
-        return;
-    }
-
-
-    // Escala máxima dinâmica para as réguas
-    const ddrScale = Math.max(2.0, parseFloat(ddr) * 1.2);
-    const drbScale = Math.max(2.0, parseFloat(drb) * 1.2);
-
-    // Atualiza os marcadores
-    updateRuler(
-        "ddrRuler",
-        "ddrFill",
-        "ddrMarker",
-        "ddrLabels",
-        "ddrAcceptable",
-        ddr,
-        limits.ddrMin,
-        limits.ddrMax,
-        limits.ddrAcceptMin,
-        limits.ddrAcceptMax,
-        ddrScale
-    );
-
-    updateRuler(
-        "drbRuler",
-        "drbFill",
-        "drbMarker",
-        "drbLabels",
-        "drbAcceptable",
-        drb,
-        limits.drbMin,
-        limits.drbMax,
-        limits.drbAcceptMin,
-        limits.drbAcceptMax,
-        drbScale
-    );
-}
-/**
- * Atualiza uma régua específica
- * @param {string} rulerId - ID do elemento da régua
- * @param {string} fillId - ID do elemento de preenchimento
- * @param {string} markerId - ID do elemento marcador
- * @param {string} labelsId - ID do elemento de rótulos
- * @param {number} value - Valor a ser marcado
- * @param {number} min - Valor mínimo recomendado
- * @param {number} max - Valor máximo recomendado
- * @param {number} scale - Escala máxima da régua
- */
-function updateRuler(
-    rulerId,
-    fillId,
-    markerId,
-    labelsId,
-    acceptableId,
-    value,
-    min,
-    max,
-    acceptMin,
-    acceptMax,
-    scale
-) {
-    const ruler = document.getElementById(rulerId);
-    const fill = document.getElementById(fillId);
-    const marker = document.getElementById(markerId);
-    const labels = document.getElementById(labelsId);
-    const acceptable = document.getElementById(acceptableId);
-
-    const rulerWidth = Math.max(ruler.clientWidth, 10);
-
-    // Calcula faixa aceitável
-    const acceptMinPos = (acceptMin / scale) * rulerWidth;
-    const acceptMaxPos = (acceptMax / scale) * rulerWidth;
-
-    const acceptableWidth = Math.max(6, (acceptMaxPos - acceptMinPos)); // pelo menos 5px
-    acceptable.style.left = acceptMinPos + "px";
-    acceptable.style.width = acceptableWidth + "px";
-
-
-    // Ajusta a posição da zona recomendada
-    const minPos = (min / scale) * rulerWidth;
-    const maxPos = (max / scale) * rulerWidth;
-
-    const fillWidth = Math.max(6, (maxPos - minPos));
-    fill.style.left = minPos + "px";
-    fill.style.width = fillWidth + "px";
-
-
-    // Posiciona o marcador atual
-    let markerPos = (value / scale) * rulerWidth;
-    markerPos = Math.max(0, Math.min(rulerWidth, markerPos));
-    marker.style.left = markerPos + "px";
-
-    // Atualiza os TOOLTIPs:
-    fill.setAttribute('data-tooltip', `Faixa ideal: ${min.toFixed(2)} – ${max.toFixed(2)}`);
-    acceptable.setAttribute('data-tooltip', `Faixa aceitável: ${acceptMin.toFixed(2)} – ${acceptMax.toFixed(2)}`);
-
-    // Atualiza os rótulos da escala
-    updateRulerLabels(labels, scale);
-}
-
-/**
- * Atualiza os rótulos da escala de uma régua
- * @param {HTMLElement} labelsElement - Elemento DOM com os rótulos
- * @param {number} scale - Escala máxima da régua
- */
-function updateRulerLabels(labelsElement, scale) {
-    // Cria pontos intermediários para a escala
-    const divisions = 5;
-    labelsElement.innerHTML = '';
-
-    for (let i = 0; i < divisions; i++) {
-        const value = (scale * i / (divisions - 1)).toFixed(1);
-        const span = document.createElement('span');
-        span.innerText = value;
-        labelsElement.appendChild(span);
-    }
 }
 
 /**
@@ -684,6 +668,7 @@ function resetForm() {
 document.addEventListener("DOMContentLoaded", async function () {
 
     await loadMaterialLimits();
+
     // Registra eventos
     document.getElementById("languageSelector").addEventListener("change", switchLanguage);
     document.getElementById("calculateBtn").addEventListener("click", calculateValues);
@@ -709,6 +694,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     renderHistory();
 
 });
+
 
 /**
  * Configura a acessibilidade para os tooltips

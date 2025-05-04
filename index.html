@@ -28,45 +28,11 @@
         <div id="lastLoaded" class="last-loaded">
             <!-- Mensagem dinâmica será inserida aqui -->
         </div>
-        
+
 
         <div class="main-wrapper">
             <!-- Coluna 1: Formulário -->
             <div class="form-section">
-                <div class="form-group">
-                    <label id="matrixLabel" for="matrixType">
-                        Tipo da Matriz
-                        <span class="tooltip-container" tabindex="0">
-                            <span class="tooltip-icon" aria-hidden="true">?</span>
-                            <span class="tooltip-text" id="matrixTooltip">
-                                Parte externa do cabeçote que define a espessura final.
-                            </span>
-                        </span>
-                    </label>
-                    <select id="matrixType">
-                        <option value="tubular">Tubular</option>
-                        <option value="semi">Semi-pressão</option>
-                        <option value="pressao">Pressão</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label id="toolLabel" for="toolType">
-                        Tipo da Guia
-                        <span class="tooltip-container" tabindex="0">
-                            <span class="tooltip-icon" aria-hidden="true">?</span>
-                            <span class="tooltip-text" id="toolTooltip">
-                                Mandril (ou Tip) que centraliza o núcleo e define a zona de extrusão.
-                            </span>
-                        </span>
-                    </label>
-                    <select id="toolType">
-                        <option value="tubular">Tubular</option>
-                        <option value="semi">Semi-pressão</option>
-                        <option value="pressao">Pressão</option>
-                    </select>
-                </div>
-
                 <div class="form-group">
                     <label id="materialLabel" for="materialType">Tipo de Material</label>
                     <select id="materialType">
@@ -139,47 +105,59 @@
         </div>
 
         <!-- Réguas abaixo das 3 colunas -->
-        <div class="ruler">
+        <div class="chart-wrapper">
             <h3>DDR</h3>
-            <div class="ruler-bar" id="ddrRuler">
-                <div class="ruler-acceptable" id="ddrAcceptable"></div>
-                <div class="ruler-fill" id="ddrFill"></div>
-                <div class="marker" id="ddrMarker"></div>
+            <div id="ddrChart"></div>
+        </div>
+        <div class="chart-legend">
+            <div class="legend-item">
+                <span class="legend-color" style="background: rgba(0, 200, 83, 0.4); border: 1px solid #00C853;"></span>
+                <span class="legend-label">
+                    <span id="idealLabel">Faixa Ideal</span>
+                </span>
             </div>
-            <div class="ruler-labels" id="ddrLabels">
-                <span>0.0</span>
-                <span>0.5</span>
-                <span>1.0</span>
-                <span>1.5</span>
-                <span>2.0</span>
+            <div class="legend-item">
+                <span class="legend-color" style="background: rgba(255, 165, 0, 0.3); border: 1px solid #FFA500;"></span>
+                <span class="legend-label">
+                    <span id="acceptableLabel">Aceitável</span>
+                </span>
             </div>
         </div>
+        
 
-        <div class="ruler">
+        <div class="chart-wrapper">
             <h3>DRB</h3>
-            <div class="ruler-bar" id="drbRuler">
-                <div class="ruler-acceptable" id="drbAcceptable"></div>
-                <div class="ruler-fill" id="drbFill"></div>
-                <div class="marker" id="drbMarker"></div>
+            <div id="drbChart"></div>
+        </div>
+        <div class="chart-legend">
+            <div class="legend-item">
+                <span class="legend-color" style="background: rgba(0, 200, 83, 0.4); border: 1px solid #00C853;"></span>
+                <span class="legend-label">
+                    <span id="idealLabel">Ideal</span>
+                </span>
             </div>
-            <div class="ruler-labels" id="drbLabels">
-                <span>0.0</span>
-                <span>0.5</span>
-                <span>1.0</span>
-                <span>1.5</span>
-                <span>2.0</span>
+            <div class="legend-item">
+                <span class="legend-color" style="background: rgba(255, 165, 0, 0.3); border: 1px solid #FFA500;"></span>
+                <span class="legend-label">
+                    <span id="acceptableLabel">Aceitável</span>
+                </span>
             </div>
         </div>
+        
+
         <div class="history-section">
             <h3 id="historyTitle">📜 Histórico de Cálculos Recentes</h3>
             <div id="historyList">
                 <p>-- Nenhum cálculo registrado ainda --</p>
             </div>
         </div>
-        
+
     </div>
-    <!-- Script final -->
-    <script src="js/app.js"></script>
+<!-- ApexCharts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="js/app.js"></script>
+
+
 </body>
 
 </html>

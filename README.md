@@ -22,6 +22,9 @@ Além dos cálculos, fornece análises detalhadas e sugestões inteligentes para
 * **💾 Persistência Local:** Salvamento e carregamento automático de configurações usando LocalStorage.
 * **♿ Acessibilidade:** Tooltips acessíveis via teclado para melhor usabilidade.
 
+ℹ️ **Observação Importante:**
+Os cálculos dependem apenas dos diâmetros reais das ferramentas (matriz e guia), e não do tipo (Tubular, Semi-pressão, Pressão).
+
 
 🔧 **Como Usar**
 
