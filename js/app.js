@@ -8,6 +8,7 @@ const translations = {
         cableLabel: "Diâmetro Final do Cabo (mm)",
         matrixDiameterLabel: "Diâmetro Interno da Matriz (mm)",
         guideOuterLabel: "Diâmetro Externo da Guia (mm)",
+        guideInnerLabel: "Diâmetro Interno da Guia (mm)",
         calculateBtn: "Calcular",
         resetBtn: "Reiniciar",
         saveBtn: "Salvar Configuração",
@@ -31,7 +32,21 @@ const translations = {
         ddrOkTip: "Relação adequada para estabilidade dimensional e bom acabamento superficial.",
         drbLowTip: "Fluxo insuficiente entre matriz e guia; pode dificultar a extrusão contínua. Ajuste necessário para evitar pontos de estrangulamento.",
         drbHighTip: "Excesso de espaço de fluxo pode gerar bolhas ou instabilidade no derretimento, além de afetar a pressão interna do cabeçote.",
-        drbOkTip: "Fluxo equilibrado entre matriz e guia, garantindo estabilidade durante a extrusão."
+        drbOkTip: "Fluxo equilibrado entre matriz e guia, garantindo estabilidade durante a extrusão.",
+        historyTitle: "📜 Histórico de Cálculos Recentes",
+        historyMaterial: "Material",
+        historyDDR: "DDR",
+        historyDRB: "DRB",
+        historyDie: "Matriz",
+        historyTip: "Guia",
+        historyCable: "Cabo",
+        historyCalculatedOn: "Calculado em",
+        noHistory: "Nenhum cálculo registrado ainda",
+        idealLabel: "Ideal",
+        acceptableLabel: "Aceitável",
+        idealLabelDRB: "Ideal",
+        acceptableLabelDRB: "Aceitável"
+
     },
     en: {
         title: "Cable Extrusion Pro: DDR/DRB Calculator & Process Insights",
@@ -39,6 +54,7 @@ const translations = {
         cableLabel: "Final Cable Diameter (mm)",
         matrixDiameterLabel: "Die Inner Diameter (mm)",
         guideOuterLabel: "Tip Outer Diameter (mm)",
+        guideInnerLabel: "Tip Inner Diameter (mm)",
         calculateBtn: "Calculate",
         resetBtn: "Reset",
         saveBtn: "Save Configuration",
@@ -62,7 +78,20 @@ const translations = {
         ddrOkTip: "Adequate ratio for dimensional stability and smooth surface finish.",
         drbLowTip: "Insufficient flow between die and tip; may hinder continuous extrusion. Adjustment needed to avoid choking points.",
         drbHighTip: "Excessive flow space may cause bubbles or melting instability and affect the internal head pressure.",
-        drbOkTip: "Balanced flow between die and tip, ensuring stability during extrusion."
+        drbOkTip: "Balanced flow between die and tip, ensuring stability during extrusion.",
+        historyTitle: "📜 Recent Calculations History",
+        historyMaterial: "Material",
+        historyDDR: "DDR",
+        historyDRB: "DRB",
+        historyDie: "Die",
+        historyTip: "Tip",
+        historyCable: "Cable",
+        historyCalculatedOn: "Calculated on",
+        noHistory: "No calculations recorded yet",
+        idealLabel: "Ideal",
+        acceptableLabel: "Acceptable",
+        idealLabelDRB: "Ideal",
+        acceptableLabelDRB: "Acceptable"
     }
 };
 
@@ -190,8 +219,10 @@ function renderHistory() {
     const historyList = document.getElementById("historyList");
     let history = JSON.parse(localStorage.getItem('ddrCalculatorHistory') || '[]');
 
+    const t = translations[state.lang];  // 🔥 Pega a tradução atual
+
     if (history.length === 0) {
-        historyList.innerHTML = `<p>-- Nenhum cálculo registrado ainda --</p>`;
+        historyList.innerHTML = `<p>-- ${t.noHistory || "Nenhum cálculo registrado ainda"} --</p>`;
         return;
     }
 
@@ -204,14 +235,14 @@ function renderHistory() {
 
         return `
             <div class="history-item">
-                <strong>🛠️ ${state.lang === "pt" ? "Material" : "Material"}: ${item.material}</strong>
-                <span>${state.lang === "pt" ? "DDR" : "DDR"}: ${item.ddr} | ${state.lang === "pt" ? "DRB" : "DRB"}: ${item.drb}</span>
+                <strong>🛠️ ${t.historyMaterial}: ${item.material}</strong>
+                <span>${t.historyDDR}: ${item.ddr} | ${t.historyDRB}: ${item.drb}</span>
                 <span class="small">
-                    ${state.lang === "pt" ? "Matriz" : "Die"}: ${item.matrixDiameter} mm,
-                    ${state.lang === "pt" ? "Guia" : "Tip"}: ${item.guideOuterDiameter} mm,
-                    ${state.lang === "pt" ? "Cabo" : "Cable"}: ${item.cableDiameter} mm
+                    ${t.historyDie}: ${item.matrixDiameter} mm,
+                    ${t.historyTip}: ${item.guideOuterDiameter} mm,
+                    ${t.historyCable}: ${item.cableDiameter} mm
                 </span>
-                <span class="small">🕒 ${state.lang === "pt" ? "Calculado em" : "Calculated on"}: ${dateStr}</span>
+                <span class="small">🕒 ${t.historyCalculatedOn}: ${dateStr}</span>
             </div>
         `;
     }).join('');
@@ -353,14 +384,11 @@ function switchLanguage() {
 
     // Atualiza textos da interface
     document.getElementById("title").innerText = t.title;
-    document.getElementById("matrixLabel").childNodes[0].textContent = t.matrixLabel + " ";
-    document.getElementById("matrixTooltip").innerText = t.matrixTooltip;
-    document.getElementById("toolLabel").childNodes[0].textContent = t.toolLabel + " ";
-    document.getElementById("toolTooltip").innerText = t.toolTooltip;
     document.getElementById("materialLabel").innerText = t.materialLabel;
     document.getElementById("cableLabel").innerText = t.cableLabel;
     document.getElementById("matrixDiameterLabel").innerText = t.matrixDiameterLabel;
     document.getElementById("guideOuterLabel").innerText = t.guideOuterLabel;
+    document.getElementById("guideInnerLabel").innerText = t.guideInnerLabel;
     document.getElementById("calculateBtn").innerText = t.calculateBtn;
     document.getElementById("resetBtn").innerText = t.resetBtn;
     document.getElementById("saveBtn").innerText = t.saveBtn;
@@ -368,14 +396,18 @@ function switchLanguage() {
     document.getElementById("areaFlowLabel").innerText = t.areaFlowLabel;
     document.getElementById("areaCableLabel").innerText = t.areaCableLabel;
     document.getElementById("obsTitle").innerText = t.obsTitle;
-    document.getElementById("idealLabel").innerText = t.obsTitle.includes("Smart") ? "Ideal" : "Ideal";
-    document.getElementById("acceptableLabel").innerText = t.obsTitle.includes("Smart") ? "Acceptable" : "Aceitável";
-
+    document.getElementById("idealLabel").innerText = t.idealLabel;
+    document.getElementById("acceptableLabel").innerText = t.acceptableLabel;
+    document.getElementById("historyTitle").innerText = t.historyTitle;
+    document.getElementById("acceptableLabelDRB").innerText = t.acceptableLabelDRB;
+    document.getElementById("historyTitleDRB").innerText = t.historyTitleDRB;
 
     // Atualiza mensagens de erro
     document.getElementById("cableDiameterError").innerText = t.errorMsg;
     document.getElementById("matrixDiameterError").innerText = t.errorMsg;
     document.getElementById("guideOuterDiameterError").innerText = t.errorMsg;
+    document.getElementById("guideInnerDiameterError").innerText = t.errorMsg;
+
 
     // Se houver um cálculo recente, atualiza as observações
     if (state.lastCalculated) {
@@ -394,6 +426,19 @@ function switchLanguage() {
     }
 
     renderHistory();
+    // Força recarregar as observações mesmo sem novo cálculo
+    if (state.lastCalculated) {
+        updateObservations(
+            state.lastCalculated.ddr,
+            state.lastCalculated.drb,
+            state.lastCalculated.material
+        );
+    } else {
+        // Se não houver cálculos, limpa ou deixa placeholder no idioma certo
+        const observationsDiv = document.getElementById("observations");
+        observationsDiv.innerHTML = state.lang === "pt" ? "-- Nenhuma observação ainda --" : "-- No observations yet --";
+    }
+
 
 
 }
@@ -406,7 +451,8 @@ function validateInputs() {
     const inputs = [
         { id: "cableDiameter", errorId: "cableDiameterError" },
         { id: "matrixDiameter", errorId: "matrixDiameterError" },
-        { id: "guideOuterDiameter", errorId: "guideOuterDiameterError" }
+        { id: "guideOuterDiameter", errorId: "guideOuterDiameterError" },
+        { id: "guideInnerDiameter", errorId: "guideInnerDiameterError" }
     ];
 
     let isValid = true;
@@ -439,6 +485,18 @@ function validateInputs() {
         document.getElementById("guideOuterDiameterError").style.display = "block";
         isValid = false;
     }
+    const guideInnerDiameter = parseFloat(document.getElementById("guideInnerDiameter").value);
+
+    if (!isNaN(guideDiameter) && !isNaN(guideInnerDiameter) && guideInnerDiameter >= guideDiameter) {
+        document.getElementById("guideInnerDiameter").classList.add("invalid");
+        document.getElementById("guideInnerDiameterError").innerText =
+            state.lang === "pt"
+                ? "O diâmetro interno da guia deve ser menor que o diâmetro externo."
+                : "The tip inner diameter must be smaller than the outer diameter.";
+        document.getElementById("guideInnerDiameterError").style.display = "block";
+        isValid = false;
+    }
+
 
     return isValid;
 }
@@ -456,15 +514,18 @@ function calculateValues() {
     const dMatrix = parseFloat(document.getElementById("matrixDiameter").value);
     const dGuideOuter = parseFloat(document.getElementById("guideOuterDiameter").value);
     const material = document.getElementById("materialType").value;
+    const dGuideInner = parseFloat(document.getElementById("guideInnerDiameter").value);
+
 
     // Cálculo das áreas
     const areaCable = Math.PI * Math.pow(dCable / 2, 2);
     const areaMatrix = Math.PI * Math.pow(dMatrix / 2, 2);
     const areaFlow = areaMatrix - Math.PI * Math.pow(dGuideOuter / 2, 2);
+    const areaGuideInner = Math.PI * Math.pow(dGuideInner / 2, 2);
 
     // Cálculo dos índices DDR e DRB
     const ddr = (areaMatrix / areaCable).toFixed(3);
-    const drb = (areaMatrix / areaFlow).toFixed(3);
+    const drb = (areaMatrix / (areaMatrix - areaGuideInner)).toFixed(3);
 
     // Atualiza os resultados na interface
     document.getElementById("matrixArea").innerText = areaMatrix.toFixed(2) + " mm²";
